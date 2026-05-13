@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parkin | Dashboard</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="dashboard">
+  <div id="toast" class="toast"></div>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="index.html">
+        <div class="logo">P</div>
+        <span>Parkin</span>
+      </a>
+      <div class="nav-links">
+        <a class="nav-link " href="destinations.html">Destinations</a>
+        <a class="nav-link " href="how.html">How it Works</a>
+        <a class="nav-link " href="about.html">About</a>
+      </div>
+      <div class="nav-actions">
+        <a id="navSignIn" class="nav-link" href="login.html">Sign In</a>
+        <a id="navDashboard" class="nav-link hidden" href="dashboard.html">Dashboard</a>
+        <button class="btn btn-primary" onclick="getStarted()">Get Started</button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="page">
+    <div class="container">
+      <div class="dashboard-head">
+        <div class="profile"><div class="avatar"></div><div><h1><span id="dashName"></span> <span class="pro"></span></h1><p style="margin:0;color:var(--muted);font-size:18px">⌖ Sheikh Zayed, Giza</p></div></div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap"><button class="btn btn-light" onclick="toast('Settings opened - demo mode')">⚙</button><a class="btn btn-primary" href="destinations.html">New Parking +</a></div>
+      </div>
+      <div class="dashboard-grid">
+        <div>
+          <div class="wallet card">
+            <div><div class="icon-box" style="background:var(--cyan);color:#fff">▣</div><small>AVAILABLE BALANCE</small><div class="wallet-balance"><span id="walletBalance">450.00</span> <span>EGP</span></div></div>
+            <div class="wallet-actions"><button class="btn" onclick="topUpWallet()">＋ Top Up</button><button class="btn" onclick="transferWallet()">↗ Transfer</button></div>
+          </div>
+          <div class="mini-stats"><div class="mini-stat card"><div class="icon-box">🚙</div><strong id="totalParkings">24</strong><span>Total Parkings</span></div><div class="mini-stat card"><div class="icon-box" style="background:var(--green-soft);color:#16a34a">◷</div><strong>48h</strong><span>Time Saved</span></div></div>
+          <div class="card" style="padding:34px;margin-top:24px"><div class="icon-box">★</div><h2>PRO Plan Active</h2><p style="color:var(--muted);line-height:1.7">You are currently saving 10% on all sessions at Arkan Plaza.</p><button class="link-btn" onclick="toast('Rewards page demo')">View My Rewards ›</button></div>
+        </div>
+        <div>
+          <div class="history-table card">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:30px 34px">
+              <div><h2 style="margin:0 0 6px">Parking History</h2><p style="margin:0;color:var(--muted)">Your last few parking sessions.</p></div>
+              <a class="link-btn" href="history.html">View All</a>
+            </div>
+            <div class="table-head"><div>Destination</div><div>Date</div><div>Duration</div><div>Amount</div><div>Status</div></div>
+            <div id="dashboardHistory"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin:44px 0 22px"><h2 style="margin:0">Saved Destinations</h2><button class="link-btn" onclick="toast('Manage saved destinations')">Manage</button></div>
+          <div class="grid grid-2">
+            <div class="card" style="padding:28px;display:flex;justify-content:space-between;align-items:center"><div><h3>Walk of Cairo</h3><p style="color:var(--muted)">Sheikh Zayed</p></div><button class="link-btn" onclick="openDestination(2)">›</button></div>
+            <div class="card" style="padding:28px;display:flex;justify-content:space-between;align-items:center"><div><h3>Arkan Plaza</h3><p style="color:var(--muted)">Sheikh Zayed</p></div><button class="link-btn" onclick="openDestination(1)">›</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a class="brand" href="index.html"><div class="logo">P</div><span>Parkin</span></a>
+          <p>Parkin is a smart urban convenience platform that transforms the parking experience from a stressful, random process into a clear, organized, digital journey.</p>
+          <div class="socials"><span>f</span><span>◎</span><span>𝕏</span><span>in</span></div>
+        </div>
+        <div>
+          <h4>PRODUCT</h4>
+          <a href="destinations.html">Browse Malls</a>
+          <a href="destinations.html">Browse Events</a>
+          <a href="about.html">Features</a>
+          <a href="details.html">Pricing</a>
+        </div>
+        <div>
+          <h4>COMPANY</h4>
+          <a href="about.html">About Us</a>
+          <a onclick="toast('Contact form demo')">Contact</a>
+          <a href="about.html">FAQ</a>
+          <a onclick="toast('Support opened')">Support</a>
+        </div>
+        <div>
+          <h4>LEGAL</h4>
+          <a onclick="toast('Privacy Policy demo')">Privacy Policy</a>
+          <a onclick="toast('Terms of Service demo')">Terms of Service</a>
+          <a onclick="toast('Cookie Policy demo')">Cookie Policy</a>
+        </div>
+      </div>
+      <div class="copyright">
+        <span>© 2026 Parkin Technologies. All rights reserved.</span>
+        <span>Made with confidence in <strong style="color:var(--text)">Egypt EG</strong></span>
+      </div>
+    </div>
+  </footer>
+  <script src="js/app.js"></script>
+</body>
+</html>

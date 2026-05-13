@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parkin | Spot Details</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="details">
+  <div id="toast" class="toast"></div>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="index.html">
+        <div class="logo">P</div>
+        <span>Parkin</span>
+      </a>
+      <div class="nav-links">
+        <a class="nav-link " href="destinations.html">Destinations</a>
+        <a class="nav-link " href="how.html">How it Works</a>
+        <a class="nav-link " href="about.html">About</a>
+      </div>
+      <div class="nav-actions">
+        <a id="navSignIn" class="nav-link" href="login.html">Sign In</a>
+        <a id="navDashboard" class="nav-link hidden" href="dashboard.html">Dashboard</a>
+        <button class="btn btn-primary" onclick="getStarted()">Get Started</button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="page">
+    <div class="container">
+      <a class="back-link" href="destinations.html">← Back to Destinations</a>
+      <div class="details-top">
+        <div class="details-title">
+          <h1><span id="detailsName">Arkan Plaza</span> <span class="open-pill">● Open Now</span></h1>
+          <div class="details-meta">
+            <span>⌖ <span id="detailsLocation">Sheikh Zayed, Giza</span></span>
+            <span>⌁ <span id="detailsDistance">2.5 km</span> from you</span>
+            <span>★ <span id="detailsRating">4.8</span> Rating</span>
+          </div>
+        </div>
+        <div class="available-widget card">
+          <div><small>Available Spots</small><strong><span id="detailsAvailable">450</span> / <span id="detailsTotal">1200</span></strong></div>
+          <button class="btn btn-primary" onclick="scrollToLot()">Navigate There</button>
+        </div>
+      </div>
+      <div class="parking-layout">
+        <div>
+          <div class="floor-tabs card">
+            <button class="floor-tab active" data-floor="A" onclick="setFloor('A')">Floor A</button>
+            <button class="floor-tab" data-floor="B" onclick="setFloor('B')">Floor B</button>
+            <button class="floor-tab" data-floor="C" onclick="setFloor('C')">Floor C</button>
+            <button class="floor-tab" data-floor="P" onclick="setFloor('P')">Premium (P)</button>
+          </div>
+          <div class="legend">
+            <span><i style="background:#fff"></i>Available</span>
+            <span><i style="background:#f3f5f8"></i>Occupied</span>
+            <span><i style="background:var(--orange-soft);border-color:#fdba74"></i>Reserved</span>
+            <span><i style="background:var(--navy)"></i>Premium</span>
+            <span><i style="background:#e9fbff;border-color:var(--cyan)"></i>Recommended</span>
+          </div>
+          <div id="lot" class="lot card">
+            <div class="entrance">ENTRANCE / EXIT</div>
+            <div id="spotsGrid" class="spots-grid"></div>
+            <div style="text-align:center;margin-top:44px;color:#c4ccd7;font-weight:950;letter-spacing:6px">△ TRAFFIC FLOW ONLY</div>
+          </div>
+        </div>
+        <aside>
+          <div class="side-panel card">
+            <div class="panel-head"><h3>Why Park Here?</h3><p id="whyText">Arkan Plaza premium facilities.</p></div>
+            <div class="panel-body">
+              <div class="benefit"><div class="icon-box" style="background:var(--green-soft);color:#16a34a">♧</div><div><h4>24/7 Security</h4><p>Constant CCTV and staff surveillance.</p></div></div>
+              <div class="benefit"><div class="icon-box">ϟ</div><div><h4>Smart Access</h4><p>Auto-gates with digital sessions.</p></div></div>
+              <div class="benefit"><div class="icon-box" style="background:#fff0dd;color:#fb5607">◷</div><div><h4>Real-time Info</h4><p>Live availability tracking.</p></div></div>
+              <div style="border-top:1px solid var(--line);padding-top:26px;margin-top:10px">
+                <h3>Pricing Breakdown</h3>
+                <div class="summary-line"><span>Regular Spot</span><strong><span id="regularPrice">20</span> EGP/hr</strong></div>
+                <div class="summary-line"><span>Premium Spot</span><strong><span id="premiumPrice">25</span> EGP/hr</strong></div>
+                <div class="summary-line"><span>Event Parking</span><strong>50 EGP/session</strong></div>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="padding:34px;background:var(--cyan);color:#fff;margin-top:28px">
+            <h2 style="margin-top:0">Need Help?</h2>
+            <p style="line-height:1.7">If you have issues finding your spot or need assistance, our local team is available 24/7.</p>
+            <button class="btn btn-outline" style="width:100%;color:#fff;border-color:rgba(255,255,255,.34)" onclick="toast('Support request sent successfully')">Contact Support</button>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+  <div id="spotModal" class="modal-backdrop hidden" onclick="closeSpotModal(event)">
+    <div class="spot-modal" onclick="event.stopPropagation()">
+      <div class="spot-modal-head">
+        <div><h2>Spot Details</h2><p>Review your selected spot at <span id="modalDestination">Arkan Plaza</span>.</p></div>
+        <div class="spot-badge"><div><span>SPOT</span><strong id="modalSpot">A-04</strong></div></div>
+      </div>
+      <div class="spot-modal-body">
+        <div class="spot-detail-grid">
+          <div><div class="mini-label">Type</div><strong id="modalType">Regular</strong></div>
+          <div><div class="mini-label">Pricing</div><strong id="modalPricing">20 EGP / hr</strong></div>
+        </div>
+        <div><div class="mini-label">Spot Features</div><span class="tag" style="border:1px solid var(--line);margin:10px 0 28px">♧ CCTV</span></div>
+        <div class="info-box">
+          <div class="icon-box" style="margin:0;background:var(--cyan);color:#fff">◷</div>
+          <div><strong>Instant Reservation</strong>By starting the session, you are reserving this spot. Your billing starts once you activate the session at the destination.</div>
+        </div>
+        <div class="form-grid">
+          <div class="field"><label>Date</label><input id="reservationDate" class="input" type="date" /></div>
+          <div class="field"><label>Time In</label><input id="reservationTime" class="input" type="time" /></div>
+          <div class="field"><label>Duration hours</label><input id="reservationHours" class="input" type="number" min="0" value="2" oninput="updateModalPrice()" /></div>
+          <div class="field"><label>Duration minutes</label><select id="reservationMinutes" class="select" onchange="updateModalPrice()"><option value="0">0 min</option><option value="15" selected>15 min</option><option value="30">30 min</option><option value="45">45 min</option></select></div>
+        </div>
+        <div class="total-line" style="margin:4px 0 28px"><span>Total</span><strong id="modalTotal">60.00 EGP</strong></div>
+        <div class="modal-actions"><button class="btn btn-light" onclick="hideSpotModal()">Cancel</button><button class="btn btn-primary" onclick="startSession()">Start Session ✅</button></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a class="brand" href="index.html"><div class="logo">P</div><span>Parkin</span></a>
+          <p>Parkin is a smart urban convenience platform that transforms the parking experience from a stressful, random process into a clear, organized, digital journey.</p>
+          <div class="socials"><span>f</span><span>◎</span><span>𝕏</span><span>in</span></div>
+        </div>
+        <div>
+          <h4>PRODUCT</h4>
+          <a href="destinations.html">Browse Malls</a>
+          <a href="destinations.html">Browse Events</a>
+          <a href="about.html">Features</a>
+          <a href="details.html">Pricing</a>
+        </div>
+        <div>
+          <h4>COMPANY</h4>
+          <a href="about.html">About Us</a>
+          <a onclick="toast('Contact form demo')">Contact</a>
+          <a href="about.html">FAQ</a>
+          <a onclick="toast('Support opened')">Support</a>
+        </div>
+        <div>
+          <h4>LEGAL</h4>
+          <a onclick="toast('Privacy Policy demo')">Privacy Policy</a>
+          <a onclick="toast('Terms of Service demo')">Terms of Service</a>
+          <a onclick="toast('Cookie Policy demo')">Cookie Policy</a>
+        </div>
+      </div>
+      <div class="copyright">
+        <span>© 2026 Parkin Technologies. All rights reserved.</span>
+        <span>Made with confidence in <strong style="color:var(--text)">Egypt EG</strong></span>
+      </div>
+    </div>
+  </footer>
+  <script src="js/app.js"></script>
+</body>
+</html>

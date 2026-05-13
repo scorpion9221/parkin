@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parkin | Register</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="register">
+  <div id="toast" class="toast"></div>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="index.html">
+        <div class="logo">P</div>
+        <span>Parkin</span>
+      </a>
+      <div class="nav-links">
+        <a class="nav-link " href="destinations.html">Destinations</a>
+        <a class="nav-link " href="how.html">How it Works</a>
+        <a class="nav-link " href="about.html">About</a>
+      </div>
+      <div class="nav-actions">
+        <a id="navSignIn" class="nav-link" href="login.html">Sign In</a>
+        <a id="navDashboard" class="nav-link hidden" href="dashboard.html">Dashboard</a>
+        <button class="btn btn-primary" onclick="getStarted()">Get Started</button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="page">
+    <div class="container">
+      <div class="auth-wrap card">
+        <div class="auth-top"><div class="logo">P</div><h1>Create Your Account</h1><p>Register once and start booking your parking sessions.</p></div>
+        <div class="auth-body">
+          <form id="registerForm" onsubmit="registerUser(event)">
+            <div class="field"><label>Full name</label><input id="registerName" class="input" placeholder="Omar Tarek" value="Omar Tarek" /><div class="error">Please enter your full name.</div></div>
+            <div class="field"><label>Email address</label><input id="registerEmail" class="input" type="email" placeholder="name@example.com" value="omar@parkin.com" /><div class="error">Please enter a valid email.</div></div>
+            <div class="field"><label>Phone number</label><input id="registerPhone" class="input" placeholder="+20 100 000 0000" value="+20 100 123 4567" /><div class="error">Please enter your phone number.</div></div>
+            <div class="field"><label>Password</label><input id="registerPassword" class="input" type="password" value="123456" /><div class="error">Password must be at least 6 characters.</div></div>
+            <button class="btn btn-primary btn-wide" type="submit">Create Account</button>
+          </form>
+          <div class="auth-switch">Already have an account? <a class="link-btn" href="login.html">Sign In</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a class="brand" href="index.html"><div class="logo">P</div><span>Parkin</span></a>
+          <p>Parkin is a smart urban convenience platform that transforms the parking experience from a stressful, random process into a clear, organized, digital journey.</p>
+          <div class="socials"><span>f</span><span>◎</span><span>𝕏</span><span>in</span></div>
+        </div>
+        <div>
+          <h4>PRODUCT</h4>
+          <a href="destinations.html">Browse Malls</a>
+          <a href="destinations.html">Browse Events</a>
+          <a href="about.html">Features</a>
+          <a href="details.html">Pricing</a>
+        </div>
+        <div>
+          <h4>COMPANY</h4>
+          <a href="about.html">About Us</a>
+          <a onclick="toast('Contact form demo')">Contact</a>
+          <a href="about.html">FAQ</a>
+          <a onclick="toast('Support opened')">Support</a>
+        </div>
+        <div>
+          <h4>LEGAL</h4>
+          <a onclick="toast('Privacy Policy demo')">Privacy Policy</a>
+          <a onclick="toast('Terms of Service demo')">Terms of Service</a>
+          <a onclick="toast('Cookie Policy demo')">Cookie Policy</a>
+        </div>
+      </div>
+      <div class="copyright">
+        <span>© 2026 Parkin Technologies. All rights reserved.</span>
+        <span>Made with confidence in <strong style="color:var(--text)">Egypt EG</strong></span>
+      </div>
+    </div>
+  </footer>
+  <script src="js/app.js"></script>
+</body>
+</html>
