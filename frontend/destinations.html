@@ -4,21 +4,1100 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Parkin | Destinations</title>
-  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    :root{
+      --bg:#eef6fc;
+      --text:#061229;
+      --muted:#526987;
+      --cyan:#18d8f3;
+      --cyan-2:#0aa8c9;
+      --navy:#061229;
+      --navy-2:#0b1d42;
+      --white:#ffffff;
+      --font:Inter,Segoe UI,Roboto,Arial,sans-serif;
+
+      --destinations-bg:url("./assets/how/parkin-how-bg.png");
+    }
+
+    *{box-sizing:border-box}
+
+    html{scroll-behavior:smooth}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:var(--font);
+      color:var(--text);
+      background:#eaf5ff;
+      overflow-x:hidden;
+    }
+
+    a{
+      color:inherit;
+      text-decoration:none;
+    }
+
+    button,
+    input,
+    select{
+      font-family:inherit;
+    }
+
+    .hidden{display:none !important}
+
+    .container{
+      width:min(1320px,88%);
+      margin:0 auto;
+    }
+
+    .page{
+      padding:0;
+    }
+
+    /* ================= NAV ================= */
+
+    .nav{
+      position:sticky;
+      top:0;
+      z-index:999;
+      padding:10px 0;
+      background:
+        linear-gradient(90deg,rgba(2,10,26,.84),rgba(5,20,48,.78)),
+        radial-gradient(circle at 24% 0%,rgba(17,181,212,.20),transparent 34%),
+        radial-gradient(circle at 82% 40%,rgba(255,255,255,.08),transparent 28%);
+      border-bottom:1px solid rgba(164,226,255,.20);
+      box-shadow:
+        0 20px 60px rgba(2,10,26,.26),
+        inset 0 1px 0 rgba(255,255,255,.10);
+      backdrop-filter:blur(26px) saturate(145%);
+      -webkit-backdrop-filter:blur(26px) saturate(145%);
+    }
+
+    .nav::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(90deg,transparent,rgba(255,255,255,.10),transparent),
+        radial-gradient(circle at 50% 100%,rgba(17,181,212,.16),transparent 38%);
+      opacity:.75;
+    }
+
+    .nav::after{
+      content:"";
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:-1px;
+      height:1px;
+      background:linear-gradient(90deg,transparent,rgba(24,216,243,.85),transparent);
+      box-shadow:0 0 18px rgba(24,216,243,.60);
+      pointer-events:none;
+    }
+
+    .nav-inner{
+      position:relative;
+      z-index:2;
+      min-height:58px;
+      display:grid;
+      grid-template-columns:1fr auto 1fr;
+      align-items:center;
+      gap:18px;
+    }
+
+    .brand{
+      width:max-content;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      color:#fff;
+      font-size:22px;
+      font-weight:950;
+      letter-spacing:-.8px;
+      white-space:nowrap;
+    }
+
+    .brand-logo-glass{
+      position:relative;
+      width:48px;
+      height:48px;
+      display:grid;
+      place-items:center;
+      border-radius:18px;
+      background:
+        linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.05)),
+        rgba(255,255,255,.04);
+      border:1px solid rgba(150,231,255,.30);
+      box-shadow:
+        0 16px 34px rgba(17,181,212,.16),
+        inset 0 1px 0 rgba(255,255,255,.30),
+        inset 0 -1px 0 rgba(17,181,212,.12);
+      overflow:hidden;
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+    }
+
+    .brand-logo-glass::before{
+      content:"";
+      position:absolute;
+      inset:6px;
+      border-radius:14px;
+      background:
+        radial-gradient(circle at 34% 26%,rgba(255,255,255,.18),transparent 38%),
+        linear-gradient(135deg,rgba(22,201,224,.18),rgba(8,128,156,.10));
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.18),
+        0 0 18px rgba(17,181,212,.16);
+      opacity:.72;
+    }
+
+    .brand-logo-glass::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(135deg,rgba(255,255,255,.34),transparent 42%);
+      pointer-events:none;
+    }
+
+    .brand-logo-glass img{
+      position:relative;
+      z-index:2;
+      width:36px;
+      height:36px;
+      object-fit:contain;
+      display:block;
+    }
+
+    .nav-links{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      padding:7px;
+      border-radius:22px;
+      background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.05));
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.22),
+        inset 0 -1px 0 rgba(24,216,243,.10),
+        0 18px 44px rgba(0,0,0,.16);
+      backdrop-filter:blur(22px) saturate(160%);
+      -webkit-backdrop-filter:blur(22px) saturate(160%);
+    }
+
+    .nav-link{
+      position:relative;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:0;
+      background:transparent;
+      color:rgba(255,255,255,.88);
+      font-size:14px;
+      font-weight:850;
+      padding:10px 18px;
+      border-radius:16px;
+      cursor:pointer;
+      transition:.22s ease;
+      overflow:hidden;
+    }
+
+    .nav-link::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:inherit;
+      background:
+        linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.04)),
+        radial-gradient(circle at 50% 0%,rgba(24,216,243,.22),transparent 60%);
+      border:1px solid rgba(255,255,255,.12);
+      opacity:0;
+      transition:.22s ease;
+    }
+
+    .nav-link:hover::before,
+    .nav-link.active::before{
+      opacity:1;
+    }
+
+    .nav-link:hover,
+    .nav-link.active{
+      color:#fff;
+      text-shadow:0 0 16px rgba(255,255,255,.28);
+      transform:translateY(-1px);
+    }
+
+    .nav-actions{
+      justify-self:end;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      white-space:nowrap;
+    }
+
+    .btn{
+      min-height:42px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:11px 17px;
+      border:0;
+      border-radius:14px;
+      font-size:14px;
+      font-weight:900;
+      cursor:pointer;
+      transition:.18s ease;
+      text-decoration:none;
+    }
+
+    .btn:hover{
+      transform:translateY(-1px);
+    }
+
+    .btn-primary{
+      color:#fff;
+      background:linear-gradient(135deg,#18d8f3 0%,#0aa8c9 100%);
+      border:1px solid rgba(255,255,255,.32);
+      box-shadow:
+        0 18px 42px rgba(17,181,212,.32),
+        inset 0 1px 0 rgba(255,255,255,.28);
+    }
+
+    .nav .btn-primary{
+      min-height:46px;
+      padding:12px 22px;
+      border-radius:16px;
+      box-shadow:
+        0 18px 44px rgba(17,181,212,.34),
+        0 0 26px rgba(24,216,243,.18),
+        inset 0 1px 0 rgba(255,255,255,.36);
+    }
+
+    /* ================= DESTINATIONS PAGE ================= */
+
+    .destinations-page{
+      position:relative;
+      min-height:calc(100vh - 79px);
+      padding:74px 0 100px;
+      overflow:hidden;
+      background-image:var(--destinations-bg);
+      background-repeat:no-repeat;
+      background-size:cover;
+      background-position:center center;
+      isolation:isolate;
+    }
+
+    .destinations-page::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:-1;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 50% 8%,rgba(255,255,255,.55),transparent 36%),
+        linear-gradient(180deg,rgba(255,255,255,.08),rgba(206,229,248,.12));
+    }
+
+    .destinations-page::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:-1;
+      pointer-events:none;
+      background:
+        linear-gradient(90deg,rgba(255,255,255,.13),transparent 18%,transparent 82%,rgba(255,255,255,.10)),
+        radial-gradient(circle at 50% 76%,rgba(24,216,243,.13),transparent 34%);
+    }
+
+    .dest-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:30px;
+      margin-bottom:34px;
+    }
+
+    .pill{
+      position:relative;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      min-height:44px;
+      padding:10px 26px;
+      border-radius:999px;
+      color:#0877d8;
+      background:
+        linear-gradient(135deg,rgba(255,255,255,.64),rgba(255,255,255,.22));
+      border:1px solid rgba(93,211,255,.66);
+      box-shadow:
+        0 14px 32px rgba(24,216,243,.18),
+        0 0 24px rgba(24,216,243,.20),
+        inset 0 1px 0 rgba(255,255,255,.82),
+        inset 0 -1px 0 rgba(24,216,243,.18);
+      backdrop-filter:blur(18px) saturate(150%);
+      -webkit-backdrop-filter:blur(18px) saturate(150%);
+      font-size:17px;
+      font-weight:950;
+    }
+
+    .pill::before{
+      content:"✦";
+      color:#108bec;
+      text-shadow:0 0 14px rgba(24,216,243,.48);
+      font-size:18px;
+    }
+
+    .dest-head h1{
+      margin:22px 0 14px;
+      color:#061229;
+      font-size:clamp(48px,4.6vw,68px);
+      line-height:.96;
+      letter-spacing:-2.6px;
+      font-weight:1000;
+      text-shadow:0 18px 36px rgba(9,26,60,.10);
+    }
+
+    .dest-head p{
+      margin:0;
+      color:#526987;
+      font-size:19px;
+      line-height:1.5;
+      font-weight:650;
+    }
+
+    .view-actions{
+      display:flex;
+      gap:14px;
+      padding-top:54px;
+    }
+
+    .view-btn{
+      width:58px;
+      height:58px;
+      padding:0;
+      border-radius:16px;
+      color:#075da9;
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.72),rgba(255,255,255,.24));
+      border:1px solid rgba(255,255,255,.72);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.92),
+        0 0 18px rgba(24,216,243,.20);
+      font-size:22px;
+    }
+
+    .toolbar{
+      position:relative;
+      display:grid;
+      grid-template-columns:1fr 180px 190px 116px;
+      align-items:center;
+      gap:18px;
+      min-height:94px;
+      padding:20px 22px;
+      margin-bottom:28px;
+      border-radius:30px;
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.34),rgba(255,255,255,.12)),
+        radial-gradient(circle at 50% 0%,rgba(255,255,255,.42),transparent 35%);
+      border:1.5px solid rgba(207,242,255,.86);
+      box-shadow:
+        0 0 0 1px rgba(24,216,243,.20),
+        0 0 30px rgba(24,216,243,.24),
+        0 28px 70px rgba(38,87,132,.16),
+        inset 0 1px 0 rgba(255,255,255,.78),
+        inset 0 -1px 0 rgba(24,216,243,.18);
+      backdrop-filter:blur(18px) saturate(150%);
+      -webkit-backdrop-filter:blur(18px) saturate(150%);
+    }
+
+    .toolbar::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:inherit;
+      background:
+        linear-gradient(135deg,rgba(255,255,255,.30),transparent 42%),
+        radial-gradient(circle at 72% 20%,rgba(24,216,243,.11),transparent 34%);
+      pointer-events:none;
+    }
+
+    .search-wrap,
+    .select-wrap{
+      position:relative;
+      z-index:2;
+      display:flex;
+      align-items:center;
+    }
+
+    .search-wrap span,
+    .select-icon{
+      position:absolute;
+      left:20px;
+      color:#0a5598;
+      font-size:22px;
+      z-index:2;
+      pointer-events:none;
+    }
+
+    .input,
+    .select{
+      width:100%;
+      min-height:58px;
+      color:#203b61;
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.56),rgba(255,255,255,.18));
+      border:1px solid rgba(255,255,255,.78);
+      border-radius:16px;
+      outline:none;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.86),
+        0 0 18px rgba(24,216,243,.10);
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+      font-size:16px;
+      font-weight:650;
+    }
+
+    .input{
+      padding:0 20px 0 58px;
+    }
+
+    .input::placeholder{
+      color:#6b7f9e;
+    }
+
+    .select{
+      appearance:none;
+      -webkit-appearance:none;
+      padding:0 42px 0 50px;
+      cursor:pointer;
+    }
+
+    .select-wrap::after{
+      content:"⌄";
+      position:absolute;
+      right:18px;
+      top:50%;
+      transform:translateY(-50%);
+      z-index:3;
+      color:#061229;
+      font-size:20px;
+      font-weight:1000;
+      pointer-events:none;
+    }
+
+    .apply-btn{
+      position:relative;
+      z-index:2;
+      min-height:58px;
+      color:#fff;
+      background:linear-gradient(135deg,#1b78d3,#0554ad);
+      border:1px solid rgba(203,252,255,.62);
+      border-radius:16px;
+      box-shadow:
+        0 18px 34px rgba(4,84,173,.28),
+        0 0 24px rgba(24,216,243,.24),
+        inset 0 1px 0 rgba(255,255,255,.45),
+        inset 0 -1px 0 rgba(0,44,112,.26);
+      font-size:17px;
+      font-weight:1000;
+    }
+
+    /* ================= DESTINATION CARDS FROM JS ================= */
+
+    .grid{
+      display:grid;
+      gap:24px;
+    }
+
+    .grid-3{
+      grid-template-columns:repeat(3,1fr);
+    }
+
+    #destinationsGrid{
+      position:relative;
+      z-index:2;
+    }
+
+    .destination-card{
+      position:relative;
+      min-height:342px;
+      overflow:hidden;
+      border-radius:26px;
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.34),rgba(255,255,255,.12)),
+        radial-gradient(circle at 50% 0%,rgba(255,255,255,.42),transparent 35%);
+      border:1.5px solid rgba(207,242,255,.86);
+      box-shadow:
+        0 0 0 1px rgba(24,216,243,.20),
+        0 0 30px rgba(24,216,243,.24),
+        0 28px 70px rgba(38,87,132,.16),
+        inset 0 1px 0 rgba(255,255,255,.78),
+        inset 0 -1px 0 rgba(24,216,243,.18);
+      backdrop-filter:blur(18px) saturate(150%);
+      -webkit-backdrop-filter:blur(18px) saturate(150%);
+      transition:.22s ease;
+    }
+
+    .destination-card:hover{
+      transform:translateY(-6px);
+      box-shadow:
+        0 0 0 1px rgba(24,216,243,.26),
+        0 0 38px rgba(24,216,243,.30),
+        0 34px 82px rgba(38,87,132,.22),
+        inset 0 1px 0 rgba(255,255,255,.84);
+    }
+
+    .destination-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:5;
+      border-radius:inherit;
+      pointer-events:none;
+      background:
+        linear-gradient(135deg,rgba(255,255,255,.26),transparent 42%),
+        radial-gradient(circle at 72% 20%,rgba(24,216,243,.10),transparent 34%);
+    }
+
+    .destination-card .cover{
+      position:relative;
+      min-height:174px;
+      padding:18px 20px;
+      color:#fff;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-end;
+      overflow:hidden;
+      background:
+        linear-gradient(180deg,rgba(3,13,34,.10) 0%,rgba(3,13,34,.88) 100%),
+        var(--img) center/cover no-repeat !important;
+    }
+
+    .destination-card .cover::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(180deg,rgba(3,13,34,.10),rgba(3,13,34,.82)),
+        radial-gradient(circle at 80% 18%,rgba(24,216,243,.18),transparent 34%);
+      pointer-events:none;
+    }
+
+    .destination-card .cover > *{
+      position:relative;
+      z-index:2;
+    }
+
+    .destination-card .tags{
+      position:absolute;
+      left:18px;
+      top:16px;
+      right:18px;
+      z-index:3;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .destination-card .tag{
+      min-height:30px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      padding:7px 13px;
+      border-radius:999px;
+      color:#061229;
+      background:rgba(255,255,255,.88);
+      border:1px solid rgba(255,255,255,.72);
+      box-shadow:0 8px 18px rgba(0,0,0,.14);
+      font-size:13px;
+      line-height:1;
+      font-weight:950;
+    }
+
+    .destination-card .tag.cyan{
+      color:#fff;
+      background:linear-gradient(135deg,#19d9f4,#089fd0);
+      border-color:rgba(255,255,255,.42);
+      box-shadow:0 10px 20px rgba(17,181,212,.28);
+    }
+
+    .destination-card .rating{
+      width:max-content;
+      margin-bottom:8px;
+      color:#fff;
+      font-size:16px;
+      font-weight:1000;
+      text-shadow:0 10px 22px rgba(0,0,0,.32);
+    }
+
+    .destination-card .rating::first-letter{
+      color:#18d8f3;
+    }
+
+    .destination-card .distance{
+      position:absolute;
+      right:18px;
+      bottom:18px;
+      z-index:3;
+      min-width:86px;
+      min-height:54px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:2px;
+      padding:8px 12px;
+      border-radius:14px;
+      color:#fff;
+      background:rgba(255,255,255,.20);
+      border:1px solid rgba(255,255,255,.34);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.22),
+        0 12px 24px rgba(0,0,0,.14);
+      text-transform:uppercase;
+      font-size:11px;
+      font-weight:1000;
+      letter-spacing:.3px;
+      text-align:center;
+    }
+
+    .destination-card .cover h3{
+      margin:0 100px 6px 0;
+      color:#fff;
+      font-size:25px;
+      line-height:1.04;
+      letter-spacing:-.8px;
+      font-weight:1000;
+      text-shadow:0 8px 28px rgba(0,0,0,.24);
+    }
+
+    .destination-card .cover p{
+      margin:0;
+      color:#fff;
+      font-size:15px;
+      line-height:1.3;
+      font-weight:700;
+      text-shadow:0 8px 24px rgba(0,0,0,.30);
+    }
+
+    .destination-card .card-body{
+      position:relative;
+      min-height:168px;
+      padding:20px 20px 18px;
+      color:#061229;
+    }
+
+    .destination-card .availability-row{
+      position:relative;
+      z-index:2;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:18px;
+      margin-bottom:18px;
+    }
+
+    .destination-card .availability-row small{
+      display:block;
+      margin-bottom:9px;
+      color:#526987;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      font-size:14px;
+      font-weight:1000;
+    }
+
+    .destination-card .availability-row strong{
+      color:#061229;
+      font-size:28px;
+      line-height:1;
+      font-weight:1000;
+    }
+
+    .destination-card .availability-row span{
+      color:#526987;
+      font-size:16px;
+      font-weight:700;
+    }
+
+    .destination-card .ring{
+      position:relative;
+      flex:0 0 auto;
+      width:62px;
+      height:62px;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      color:#061229;
+      font-size:15px;
+      font-weight:1000;
+      background:conic-gradient(#18d8f3 calc(var(--percent) * 1%),rgba(255,255,255,.55) 0);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.66),
+        0 0 18px rgba(24,216,243,.18);
+    }
+
+    .destination-card .ring::before{
+      content:"";
+      position:absolute;
+      width:50px;
+      height:50px;
+      border-radius:50%;
+      background:linear-gradient(145deg,rgba(255,255,255,.72),rgba(255,255,255,.30));
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.90);
+    }
+
+    .destination-card .ring span{
+      position:relative;
+      z-index:2;
+    }
+
+    .destination-card .btn,
+    .destination-card .btn-dark,
+    .destination-card .btn-primary{
+      position:relative;
+      z-index:2;
+      width:100%;
+      min-height:44px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      color:#fff;
+      background:
+        linear-gradient(135deg,rgba(60,150,222,.74),rgba(36,93,171,.72));
+      border:1px solid rgba(203,252,255,.62);
+      border-radius:13px;
+      box-shadow:
+        0 14px 28px rgba(4,84,173,.22),
+        0 0 22px rgba(24,216,243,.20),
+        inset 0 1px 0 rgba(255,255,255,.45),
+        inset 0 -1px 0 rgba(0,44,112,.20);
+      font-size:16px;
+      font-weight:1000;
+      cursor:pointer;
+    }
+
+    .destination-card .btn:hover,
+    .destination-card .btn-dark:hover,
+    .destination-card .btn-primary:hover{
+      transform:translateY(-1px);
+      background:linear-gradient(135deg,#18d8f3,#0aa8c9);
+    }
+
+    /* list view support لو الـ JS بيغير شكل العرض */
+    #destinationsGrid.list-view,
+    #destinationsGrid.list{
+      grid-template-columns:1fr;
+    }
+
+    #destinationsGrid.list-view .destination-card,
+    #destinationsGrid.list .destination-card{
+      display:grid;
+      grid-template-columns:360px 1fr;
+      min-height:230px;
+    }
+
+    #destinationsGrid.list-view .cover,
+    #destinationsGrid.list .cover{
+      min-height:230px;
+    }
+
+    /* ================= FOOTER ================= */
+
+    .footer{
+      position:relative;
+      padding:48px 0;
+      background:#061229;
+      color:#fff;
+      border-top:1px solid rgba(164,226,255,.18);
+    }
+
+    .footer-grid{
+      display:grid;
+      grid-template-columns:1.4fr 1fr 1fr 1fr;
+      gap:42px;
+      padding-bottom:34px;
+      border-bottom:1px solid rgba(255,255,255,.12);
+    }
+
+    .footer .brand{
+      margin-bottom:18px;
+    }
+
+    .footer p{
+      max-width:440px;
+      margin:0;
+      color:rgba(235,246,255,.72);
+      font-size:15px;
+      line-height:1.65;
+      font-weight:600;
+    }
+
+    .footer h4{
+      margin:0 0 22px;
+      color:#55eaff;
+      letter-spacing:4px;
+      font-size:12px;
+      font-weight:1000;
+    }
+
+    .footer a:not(.brand){
+      display:block;
+      margin-bottom:14px;
+      color:rgba(255,255,255,.82);
+      font-size:15px;
+      font-weight:750;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+
+    .footer a:not(.brand):hover{
+      color:#55eaff;
+      transform:translateX(3px);
+    }
+
+    .socials{
+      display:flex;
+      gap:12px;
+      margin-top:24px;
+    }
+
+    .socials span{
+      width:42px;
+      height:42px;
+      display:grid;
+      place-items:center;
+      border-radius:13px;
+      color:#fff;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(190,229,255,.24);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.18),
+        0 0 18px rgba(24,216,243,.10);
+      font-size:17px;
+      font-weight:900;
+    }
+
+    .copyright{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:18px;
+      flex-wrap:wrap;
+      padding-top:26px;
+      color:rgba(235,246,255,.72);
+      font-size:14px;
+      font-weight:650;
+    }
+
+    .copyright strong{
+      color:#9ff4ff;
+    }
+
+    .toast{
+      position:fixed;
+      right:18px;
+      bottom:18px;
+      z-index:2000;
+      display:none;
+      max-width:360px;
+      padding:13px 16px;
+      border-radius:14px;
+      color:#fff;
+      background:#061229;
+      box-shadow:0 20px 44px rgba(0,0,0,.22);
+      font-size:14px;
+      font-weight:800;
+    }
+
+    /* ================= RESPONSIVE ================= */
+
+    @media(max-width:1200px){
+      .grid-3{
+        grid-template-columns:repeat(2,1fr);
+      }
+
+      .toolbar{
+        grid-template-columns:1fr 170px;
+      }
+
+      .footer-grid{
+        grid-template-columns:1fr 1fr;
+      }
+    }
+
+    @media(max-width:900px){
+      .nav-inner{
+        grid-template-columns:1fr auto;
+        padding:4px 0;
+      }
+
+      .nav-links{
+        grid-column:1 / -1;
+        width:100%;
+        justify-content:center;
+        overflow:auto;
+      }
+
+      .destinations-page{
+        padding:58px 0 80px;
+      }
+
+      .dest-head{
+        flex-direction:column;
+      }
+
+      .view-actions{
+        padding-top:0;
+      }
+
+      .dest-head h1{
+        font-size:48px;
+        letter-spacing:-1.8px;
+      }
+
+      .toolbar{
+        grid-template-columns:1fr;
+      }
+
+      .grid-3{
+        grid-template-columns:1fr;
+      }
+
+      #destinationsGrid.list-view .destination-card,
+      #destinationsGrid.list .destination-card{
+        display:block;
+      }
+    }
+
+    @media(max-width:620px){
+      .container{
+        width:92%;
+      }
+
+      .nav-actions .btn-primary{
+        display:none;
+      }
+
+      .brand-logo-glass{
+        width:44px;
+        height:44px;
+        border-radius:16px;
+      }
+
+      .brand-logo-glass img{
+        width:32px;
+        height:32px;
+      }
+
+      .nav-link{
+        padding:10px 13px;
+        font-size:13px;
+      }
+
+      .destinations-page{
+        padding:44px 0 64px;
+        background-position:center center;
+      }
+
+      .pill{
+        min-height:40px;
+        padding:9px 20px;
+        font-size:15px;
+      }
+
+      .dest-head h1{
+        font-size:39px;
+        letter-spacing:-1.3px;
+      }
+
+      .dest-head p{
+        font-size:16px;
+      }
+
+      .toolbar{
+        padding:16px;
+        border-radius:24px;
+        gap:14px;
+      }
+
+      .input,
+      .select,
+      .apply-btn{
+        min-height:54px;
+      }
+
+      .destination-card{
+        border-radius:24px;
+      }
+
+      .destination-card .cover{
+        min-height:188px;
+        padding:16px;
+      }
+
+      .destination-card .cover h3{
+        margin-right:82px;
+        font-size:22px;
+      }
+
+      .destination-card .cover p{
+        font-size:14px;
+      }
+
+      .destination-card .card-body{
+        padding:18px 16px 16px;
+      }
+
+      .destination-card .availability-row strong{
+        font-size:24px;
+      }
+
+      .destination-card .availability-row span{
+        font-size:14px;
+      }
+
+      .footer-grid{
+        grid-template-columns:1fr;
+        gap:32px;
+      }
+
+      .copyright{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+    }
+  </style>
 </head>
+
 <body data-page="destinations">
   <div id="toast" class="toast"></div>
+
   <nav class="nav">
     <div class="container nav-inner">
       <a class="brand" href="index.html">
-        <div class="logo">P</div>
-        <span>Parkin</span>
+        <div class="brand-logo-glass">
+          <img src="./assets/home/parkin-nav-logo.png" alt="Parkin logo">
+        </div>
       </a>
+
       <div class="nav-links">
         <a class="nav-link active" href="destinations.html">Destinations</a>
-        <a class="nav-link " href="how.html">How it Works</a>
-        <a class="nav-link " href="about.html">About</a>
+        <a class="nav-link" href="how.html">How it Works</a>
+        <a class="nav-link" href="about.html">About</a>
       </div>
+
       <div class="nav-actions">
         <a id="navSignIn" class="nav-link" href="login.html">Sign In</a>
         <a id="navDashboard" class="nav-link hidden" href="dashboard.html">Dashboard</a>
@@ -27,41 +1106,88 @@
     </div>
   </nav>
 
-  <section class="page compact">
-    <div class="container">
-      <div class="dest-head">
-        <div>
-          <div class="pill">Discover</div>
-          <h1>Browse Destinations</h1>
-          <p>Find the best parking spots across Egypt's top malls and events.</p>
+  <main class="page">
+    <section class="destinations-page">
+      <div class="container">
+        <div class="dest-head">
+          <div>
+            <div class="pill">Discover</div>
+            <h1>Browse Destinations</h1>
+            <p>Find the best parking spots across Egypt's top malls and events.</p>
+          </div>
+
+          <div class="view-actions">
+            <button class="btn view-btn" onclick="setView('grid')" aria-label="Grid view">▦</button>
+            <button class="btn view-btn" onclick="setView('list')" aria-label="List view">☷</button>
+          </div>
         </div>
-        <div style="display:flex;gap:12px">
-          <button class="btn btn-light" onclick="setView('grid')">▦</button>
-          <button class="btn btn-light" onclick="setView('list')">☷</button>
+
+        <div class="toolbar">
+          <div class="search-wrap">
+            <span>⌕</span>
+            <input
+              id="searchInput"
+              class="input"
+              placeholder="Search by mall, event, or area..."
+              oninput="renderDestinations()"
+            />
+          </div>
+
+          <div class="select-wrap">
+            <span class="select-icon">▣</span>
+            <select id="typeFilter" class="select" onchange="renderDestinations()">
+              <option value="all">All Types</option>
+              <option value="Mall">Malls</option>
+              <option value="Event">Events</option>
+            </select>
+          </div>
+
+          <div class="select-wrap">
+            <span class="select-icon">↕</span>
+            <select id="sortFilter" class="select" onchange="renderDestinations()">
+              <option value="nearest">Nearest First</option>
+              <option value="available">Most Available</option>
+              <option value="priceLow">Price Low</option>
+              <option value="rating">Top Rated</option>
+            </select>
+          </div>
+
+          <button class="btn apply-btn" onclick="renderDestinations()">
+            Apply
+            <span>→</span>
+          </button>
         </div>
+
+        <div id="destinationsGrid" class="grid grid-3"></div>
       </div>
-      <div class="toolbar card">
-        <div class="search-wrap"><span>⌕</span><input id="searchInput" class="input" placeholder="Search by mall, event, or area..." oninput="renderDestinations()" /></div>
-        <select id="typeFilter" class="select" onchange="renderDestinations()">
-          <option value="all">All</option><option value="Mall">Malls</option><option value="Event">Events</option>
-        </select>
-        <select id="sortFilter" class="select" onchange="renderDestinations()">
-          <option value="nearest">Nearest First</option><option value="available">Most Available</option><option value="priceLow">Price Low</option><option value="rating">Top Rated</option>
-        </select>
-        <button class="btn btn-dark" onclick="renderDestinations()">Apply</button>
-      </div>
-      <div id="destinationsGrid" class="grid grid-3"></div>
-    </div>
-  </section>
+    </section>
+  </main>
 
   <footer class="footer">
     <div class="container">
       <div class="footer-grid">
         <div>
-          <a class="brand" href="index.html"><div class="logo">P</div><span>Parkin</span></a>
-          <p>Parkin is a smart urban convenience platform that transforms the parking experience from a stressful, random process into a clear, organized, digital journey.</p>
-          <div class="socials"><span>f</span><span>◎</span><span>𝕏</span><span>in</span></div>
+          <a class="brand" href="index.html">
+            <div class="brand-logo-glass">
+              <img src="./assets/home/parkin-nav-logo.png" alt="Parkin logo">
+            </div>
+            <span>Parkin</span>
+          </a>
+
+          <p>
+            Parkin is a smart urban convenience platform that transforms the parking
+            experience from a stressful, random process into a clear, organized,
+            digital journey.
+          </p>
+
+          <div class="socials">
+            <span>f</span>
+            <span>◎</span>
+            <span>𝕏</span>
+            <span>in</span>
+          </div>
         </div>
+
         <div>
           <h4>PRODUCT</h4>
           <a href="destinations.html">Browse Malls</a>
@@ -69,6 +1195,7 @@
           <a href="about.html">Features</a>
           <a href="details.html">Pricing</a>
         </div>
+
         <div>
           <h4>COMPANY</h4>
           <a href="about.html">About Us</a>
@@ -76,6 +1203,7 @@
           <a href="about.html">FAQ</a>
           <a onclick="toast('Support opened')">Support</a>
         </div>
+
         <div>
           <h4>LEGAL</h4>
           <a onclick="toast('Privacy Policy demo')">Privacy Policy</a>
@@ -83,12 +1211,14 @@
           <a onclick="toast('Cookie Policy demo')">Cookie Policy</a>
         </div>
       </div>
+
       <div class="copyright">
         <span>© 2026 Parkin Technologies. All rights reserved.</span>
-        <span>Made with confidence in <strong style="color:var(--text)">Egypt EG</strong></span>
+        <span>Made with confidence in <strong>Egypt EG</strong></span>
       </div>
     </div>
   </footer>
+
   <script src="js/app.js"></script>
 </body>
 </html>
