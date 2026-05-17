@@ -267,6 +267,7 @@
 
     .btn:hover {
       transform: translateY(-1px)
+      
     }
 
     .btn-primary,
@@ -301,15 +302,18 @@
     }
 
     /* ================= HERO ================= */
-
+    
     .home-hero {
       position: relative;
       min-height: calc(100vh - 78px);
       overflow: hidden;
+
       background-image: var(--hero-bg);
       background-repeat: no-repeat;
-      background-size: cover;
-      background-position: center center;
+
+      background-size: contain;
+      background-position: right center;
+
       background-color: #eef6fc;
     }
 
@@ -319,26 +323,39 @@
       inset: 0;
       z-index: 1;
       pointer-events: none;
+
       background:
-        linear-gradient(90deg,
-          rgba(247, 252, 255, .42) 0%,
-          rgba(247, 252, 255, .28) 34%,
-          rgba(247, 252, 255, .05) 62%,
-          rgba(247, 252, 255, 0) 100%);
+        linear-gradient(
+          90deg,
+          rgba(247,252,255,.94) 0%,
+          rgba(247,252,255,.82) 18%,
+          rgba(247,252,255,.45) 36%,
+          rgba(247,252,255,.08) 55%,
+          rgba(247,252,255,0) 72%
+        );
     }
+    
 
     .home-hero-inner {
       position: relative;
       z-index: 2;
       min-height: calc(100vh - 78px);
+
       display: flex;
       align-items: center;
-      padding: 72px 0 58px;
+      justify-content: flex-start;
+
+      padding: 72px 0 58px 40px;
     }
 
     .home-hero-content {
-      width: min(680px, 48%);
+      width: 520px;
+      max-width: 42%;
+
       padding-top: 12px;
+
+      
+      transform: translateX(-300px);
     }
 
     .pill {

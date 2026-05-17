@@ -1,4 +1,4 @@
-
+/*
 :root{
   --bg:#f5f8fc;
   --bg-soft:#eef7fb;
@@ -367,7 +367,7 @@ label{display:block;font-weight:900;margin-bottom:9px;color:var(--text)}
 }
 
 
-/* ===== V3 COMPACT FIXES ===== */
+ ===== V3 COMPACT FIXES ===== 
 .page{padding:34px 0 54px}
 .section{padding:56px 0}
 .container{width:min(1500px,88%)}
@@ -413,7 +413,7 @@ label{display:block;font-weight:900;margin-bottom:9px;color:var(--text)}
 .payment-card,.payment-panel{padding:28px}
 .receipt{padding:36px}
 
-/* Modal forced compact */
+ Modal forced compact 
 .modal-backdrop{
   align-items:center !important;
   padding:18px !important;
@@ -499,7 +499,7 @@ label{display:block;font-weight:900;margin-bottom:9px;color:var(--text)}
 }
 
 
-/* ===== V4 POLISH: SMALLER UI + LOGOUT ===== */
+
 :root{
   --radius:22px;
   --shadow:0 12px 30px rgba(9,22,49,.07);
@@ -647,7 +647,8 @@ label{font-size:14px;margin-bottom:6px}
 }
 
 body[data-page="about"] .feature-card{margin-top:0 !important;}
-body[data-page="about"] .grid .grid-2{gap:18px;}
+body[data-page="about"] .grid .grid-2{gap:18px;} 
+*/
 
 
 

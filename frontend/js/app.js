@@ -19,7 +19,13 @@ let state = {
   view:"grid",
   floor:"A",
   loggedIn:false,
-  currentUser:{name:"Omar Tarek",email:"omar@parkin.com",phone:"+20 100 123 4567"},
+
+  currentUser:{
+    name:"Guest User",
+    email:"",
+    phone:""
+  },
+
   currentDestination:destinations[0],
   selectedSpot:null,
   selectedSpotType:"Regular",
@@ -54,17 +60,7 @@ function loadState(){
 function navTo(page){ window.location.href = page; }
 function getStarted(){ navTo(state.loggedIn ? "destinations.html" : "register.html"); }
 
-function protectPage(){
-  const protectedPages = ["destinations","details","checkout","confirmation","dashboard","history","how","about"];
-  const page = document.body.dataset.page;
-  if(protectedPages.includes(page) && !state.loggedIn){
-    localStorage.setItem("parkinRedirectAfterLogin", window.location.pathname.split("/").pop() || "destinations.html");
-    toast("Please login or create an account first");
-    setTimeout(() => navTo("login.html"), 650);
-    return false;
-  }
-  return true;
-}
+
 function toast(message){
   let t = document.getElementById("toast");
   if(!t){
@@ -101,13 +97,7 @@ function updateNav(){
   if(logout) logout.classList.toggle("hidden", !state.loggedIn);
 }
 
-function logoutUser(){
-  state.loggedIn = false;
-  saveState();
-  localStorage.removeItem("parkinRedirectAfterLogin");
-  toast("Logged out successfully");
-  setTimeout(() => navTo("index.html"), 350);
-}
+
 function renderCard(d){
   const percent = Math.round((d.available / d.total) * 100);
   const priceText = d.type === "Event" ? `${d.price} EGP/session` : `${d.price} EGP/hr`;
@@ -160,10 +150,17 @@ function openDestination(id){
     setTimeout(() => navTo("login.html"), 650);
     return;
   }
+
   const d = destinations.find(x => x.id === id) || destinations[0];
-  state.currentDestination = d;
+
+  state.currentDestination = {...d};
+
   state.selectedSpot = null;
-  state.selectedPrice = d.price;
+  state.selectedSpotType = "Regular";
+
+  // IMPORTANT FIX
+  state.selectedPrice = Number(d.price);
+
   saveState();
   navTo("details.html");
 }
@@ -201,10 +198,29 @@ function selectSpot(code,type){
   if(type === "reserved" || type === "occupied"){ toast("This spot is not available"); return; }
   state.selectedSpot = code;
   state.selectedSpotType = type === "premium" || state.floor === "P" ? "Premium" : type === "recommended" ? "Recommended" : "Regular";
-  state.selectedPrice = state.currentDestination.type === "Event" ? state.currentDestination.price : state.currentDestination.price + (state.selectedSpotType === "Premium" ? 5 : 0);
+  const basePrice = Number(state.currentDestination.price || 0);
+
+state.selectedPrice =
+  state.currentDestination.type === "Event"
+    ? basePrice
+    : basePrice + (state.selectedSpotType === "Premium" ? 5 : 0);
   saveState();
   renderSpots();
   showSpotModal();
+  setTimeout(() => {
+  const hoursEl = document.getElementById("reservationHours");
+  const minutesEl = document.getElementById("reservationMinutes");
+
+  if(hoursEl){
+    hoursEl.addEventListener("input", updateModalPrice);
+    hoursEl.addEventListener("change", updateModalPrice);
+  }
+
+  if(minutesEl){
+    minutesEl.addEventListener("input", updateModalPrice);
+    minutesEl.addEventListener("change", updateModalPrice);
+  }
+}, 50);
 }
 function showSpotModal(){
   const now = new Date();
@@ -226,59 +242,239 @@ function hideSpotModal(){
   document.body.classList.remove("modal-open");
 }
 function closeSpotModal(e){ if(e.target.id === "spotModal") hideSpotModal(); }
-function updateModalPrice(){ setText("modalTotal", money(calculateTotal())); }
+function updateModalPrice(){
+
+  const total = calculateTotal();
+
+  setText("modalTotal", money(total));
+}
 function calculateDurationDecimal(){
-  const hours = Number(document.getElementById("reservationHours")?.value || localStorage.getItem("parkinHours") || 2);
-  const minutes = Number(document.getElementById("reservationMinutes")?.value || localStorage.getItem("parkinMinutes") || 15);
-  return Math.max(0.25, hours + minutes / 60);
+
+  const hours =
+    Number(document.getElementById("reservationHours")?.value || 0);
+
+  const minutes =
+    Number(document.getElementById("reservationMinutes")?.value || 0);
+
+  const total = hours + (minutes / 60);
+
+  if(hours === 0 && minutes === 0){
+    return 0;
+  }
+
+  return total;
 }
 function calculateTotal(){
-  if(state.currentDestination.type === "Event") return state.currentDestination.price;
-  return state.selectedPrice * calculateDurationDecimal();
+
+  const duration = calculateDurationDecimal();
+
+  const pricePerHour =
+    state.selectedSpotType === "premium"
+      ? 27
+      : 22;
+
+  const total = duration * pricePerHour;
+
+  return total.toFixed(2);
+}
+function calculateDurationDecimal(){
+  const hours = Number(document.getElementById("reservationHours")?.value || 0);
+  const minutes = Number(document.getElementById("reservationMinutes")?.value || 0);
+
+  const total = hours + (minutes / 60);
+
+  // لو كله صفر يرجع صفر
+  if(hours === 0 && minutes === 0){
+    return 0;
+  }
+
+  return total;
+}
+function calculateTotal(){
+
+  // Events سعر ثابت
+  if(state.currentDestination.type === "Event"){
+    return Number(state.currentDestination.price || 0);
+  }
+
+  const duration = calculateDurationDecimal();
+
+  // لو الوقت صفر يبقى التوتال صفر
+  if(duration <= 0){
+    return 0;
+  }
+
+  const hourlyPrice = Number(state.selectedPrice || 0);
+
+  return hourlyPrice * duration;
 }
 function startSession(){
+
   if(!state.loggedIn){
+
     hideSpotModal();
-    localStorage.setItem("parkinRedirectAfterLogin", "details.html");
-    toast("Please login or create an account first");
+
+    localStorage.setItem(
+      "parkinRedirectAfterLogin",
+      "details.html"
+    );
+
+    toast("Please login first");
+
     setTimeout(() => navTo("login.html"), 650);
+
     return;
   }
-  const date = document.getElementById("reservationDate").value;
-  const time = document.getElementById("reservationTime").value;
-  const hours = document.getElementById("reservationHours").value;
-  const minutes = document.getElementById("reservationMinutes").value;
+
+  const date =
+    document.getElementById("reservationDate").value;
+
+  const time =
+    document.getElementById("reservationTime").value;
+
+  const hours =
+    Number(document.getElementById("reservationHours").value || 0);
+
+  const minutes =
+    Number(document.getElementById("reservationMinutes").value || 0);
+    const total = calculateTotal();
+
   localStorage.setItem("parkinDate", date);
   localStorage.setItem("parkinTime", time);
   localStorage.setItem("parkinHours", hours);
   localStorage.setItem("parkinMinutes", minutes);
+
+  localStorage.setItem(
+    "parkinDestination",
+    JSON.stringify(state.currentDestination)
+  );
+
+  localStorage.setItem(
+    "parkinSpot",
+    state.selectedSpot
+  );
+
+  localStorage.setItem(
+    "parkinSpotType",
+    state.selectedSpotType
+  );
+
+  localStorage.setItem(
+    "parkinSelectedPrice",
+    state.selectedPrice
+  );
+
+  localStorage.setItem(
+  "parkinTotal",
+  total
+);
+  const bookingData = {
+
+  destination:
+    state.currentDestination?.name || "Unknown",
+
+  spot:
+    state.selectedSpot,
+
+  date:
+    date,
+
+  timeIn:
+    time,
+
+  duration:
+    `${hours}h ${minutes}m`,
+
+  price:
+    total
+};
+
+localStorage.setItem(
+  "selectedBooking",
+  JSON.stringify(bookingData)
+);
   saveState();
+
   hideSpotModal();
+
   navTo("checkout.html");
 }
 function initCheckout(){
   if(!state.selectedSpot){ toast("Please select a spot first"); setTimeout(()=>navTo("destinations.html"),700); return; }
   updateCheckout();
 }
+function getCurrentBookingData(){
+
+  return {
+    destination: JSON.parse(localStorage.getItem("parkinDestination") || "{}"),
+    spot: localStorage.getItem("parkinSpot") || "",
+    spotType: localStorage.getItem("parkinSpotType") || "",
+    date: localStorage.getItem("parkinDate") || "",
+    time: localStorage.getItem("parkinTime") || "",
+    hours: Number(localStorage.getItem("parkinHours") || 0),
+    minutes: Number(localStorage.getItem("parkinMinutes") || 0),
+    total: Number(localStorage.getItem("parkinTotal") || 0),
+    price: Number(localStorage.getItem("parkinSelectedPrice") || 0)
+  };
+}
 function updateCheckout(){
-  const date = localStorage.getItem("parkinDate") || "2026-03-10";
-  const time = localStorage.getItem("parkinTime") || "14:30";
-  const duration = getDurationText();
-  const total = calculateTotal();
-  setText("payDestination", state.currentDestination.name);
-  setText("paySpot", state.selectedSpot);
-  setText("payDate", readableDate(date));
-  setText("payTime", time);
-  setText("payDuration", duration);
-  setText("payPrice", state.currentDestination.type === "Event" ? `${state.selectedPrice} EGP / session` : `${state.selectedPrice} EGP / hr`);
-  setText("paySubtotal", money(total));
-  setText("payTotal", money(total));
-  setText("checkoutWalletBalance", state.walletBalance.toFixed(2));
+
+  const booking = getCurrentBookingData();
+
+  setText(
+    "payDestination",
+    booking.destination.name || "-"
+  );
+
+  setText(
+    "paySpot",
+    booking.spot || "-"
+  );
+
+  setText(
+    "payDate",
+    readableDate(booking.date)
+  );
+
+  setText(
+    "payTime",
+    booking.time
+  );
+
+  setText(
+    "payDuration",
+    `${booking.hours}h ${String(booking.minutes).padStart(2,"0")}m`
+  );
+
+  setText(
+    "payPrice",
+    booking.destination.type === "Event"
+      ? `${booking.price} EGP / session`
+      : `${booking.price} EGP / hr`
+  );
+
+  setText(
+    "paySubtotal",
+    money(booking.total)
+  );
+
+  setText(
+    "payTotal",
+    money(booking.total)
+  );
+
+  setText(
+    "checkoutWalletBalance",
+    Number(state.walletBalance || 0).toFixed(2)
+  );
+
   updatePaymentLabel();
 }
 function getDurationText(){
-  const h = Number(localStorage.getItem("parkinHours") || 2);
-  const m = Number(localStorage.getItem("parkinMinutes") || 15);
+
+  const h = Number(localStorage.getItem("parkinHours") || 0);
+  const m = Number(localStorage.getItem("parkinMinutes") || 0);
+
   return `${h}h ${String(m).padStart(2,"0")}m`;
 }
 function addDuration(time,hours,minutes){
@@ -304,46 +500,7 @@ function updatePaymentLabel(){
   if(state.selectedPayment === "Parkin Wallet") label = "PAYMENT METHOD<br><strong>Parkin Wallet</strong>";
   labelEl.innerHTML = label;
 }
-function completePayment(event){
-  event.preventDefault();
-  clearInvalid();
-  if(state.selectedPayment === "Card"){
-    let ok = true;
-    ok = validateRequired("cardName") && ok;
-    ok = validateCardNumber() && ok;
-    ok = validateExpiry() && ok;
-    ok = validateCvv() && ok;
-    if(!ok) return;
-  }
-  if(state.selectedPayment === "Wallet" && !validateRequired("walletNumber")) return;
-  const total = calculateTotal();
-  if(state.selectedPayment === "Parkin Wallet"){
-    if(state.walletBalance < total){ toast("Not enough wallet balance"); return; }
-    state.walletBalance -= total;
-  }
-  const time = localStorage.getItem("parkinTime") || "14:30";
-  const hours = Number(localStorage.getItem("parkinHours") || 2);
-  const minutes = Number(localStorage.getItem("parkinMinutes") || 15);
-  const dateValue = localStorage.getItem("parkinDate") || "2026-03-10";
-  const receipt = {
-    id:"PK-" + Math.floor(1000 + Math.random()*9000) + "-XJ",
-    destination:state.currentDestination.name,
-    location:state.currentDestination.location,
-    spot:state.selectedSpot,
-    date:readableDate(dateValue),
-    timeIn:time,
-    timeOut:addDuration(time,hours,minutes),
-    duration:getDurationText(),
-    amount:money(total),
-    payment:getReceiptPaymentLabel(),
-    status:"active"
-  };
-  state.lastReceipt = receipt;
-  state.history.unshift(receipt);
-  saveState();
-  toast("Payment successful");
-  navTo("confirmation.html");
-}
+
 function getReceiptPaymentLabel(){
   if(state.selectedPayment === "Card"){
     const digits = document.getElementById("cardNumber").value.replace(/\D/g,"");
@@ -353,8 +510,11 @@ function getReceiptPaymentLabel(){
   return "Parkin Wallet";
 }
 function renderReceipt(){
-  const r = state.lastReceipt || state.history[0];
+
+  const r = state.lastReceipt;
+
   if(!r) return;
+
   setText("receiptId", r.id);
   setText("receiptDestination", r.destination);
   setText("receiptLocation", r.location);
@@ -365,20 +525,17 @@ function renderReceipt(){
   setText("receiptTimeOut", r.timeOut);
   setText("receiptSubtotal", r.amount);
   setText("receiptTotal", r.amount);
-  const pay = document.getElementById("receiptPayment");
-  if(pay) pay.innerHTML = `PAYMENT METHOD<br><strong>${r.payment}</strong>`;
+
+  const pay =
+    document.getElementById("receiptPayment");
+
+  if(pay){
+    pay.innerHTML =
+      `PAYMENT METHOD<br><strong>${r.payment}</strong>`;
+  }
 }
-function renderDashboard(){
-  setText("dashName", state.currentUser.name || "Omar Tarek");
-  setText("walletBalance", state.walletBalance.toFixed(2));
-  setText("totalParkings", state.history.length + 20);
-  const el = document.getElementById("dashboardHistory");
-  if(el) el.innerHTML = state.history.slice(0,4).map(historyRow).join("") || emptyHistory();
-}
-function renderFullHistory(){
-  const el = document.getElementById("fullHistory");
-  if(el) el.innerHTML = state.history.map((b,index)=>historyRow(b,index,true)).join("") || emptyHistory();
-}
+
+
 function historyRow(b,index,withCancel=false){
   return `
     <div class="history-row">
@@ -390,52 +547,9 @@ function historyRow(b,index,withCancel=false){
     </div>`;
 }
 function emptyHistory(){ return `<div style="padding:40px;text-align:center;color:var(--muted)">No parking sessions yet.</div>`; }
-function cancelBooking(index){
-  state.history[index].status = "cancelled";
-  saveState();
-  renderFullHistory();
-  renderDashboard();
-  toast("Booking cancelled");
-}
-function loginUser(event){
-  event.preventDefault();
-  clearInvalid();
-  let ok = true;
-  ok = validateEmail("loginEmail") && ok;
-  const pass = document.getElementById("loginPassword");
-  if(pass.value.trim().length < 6){ markInvalid(pass); ok = false; }
-  if(!ok) return;
-  state.loggedIn = true;
-  state.currentUser.email = document.getElementById("loginEmail").value.trim();
-  state.currentUser.name = state.currentUser.name || "Omar Tarek";
-  saveState();
-  toast("Signed in successfully");
-  const redirect = localStorage.getItem("parkinRedirectAfterLogin");
-  localStorage.removeItem("parkinRedirectAfterLogin");
-  navTo(redirect || "dashboard.html");
-}
-function registerUser(event){
-  event.preventDefault();
-  clearInvalid();
-  let ok = true;
-  ok = validateRequired("registerName") && ok;
-  ok = validateEmail("registerEmail") && ok;
-  ok = validateRequired("registerPhone") && ok;
-  const pass = document.getElementById("registerPassword");
-  if(pass.value.trim().length < 6){ markInvalid(pass); ok = false; }
-  if(!ok) return;
-  state.loggedIn = true;
-  state.currentUser = {
-    name:document.getElementById("registerName").value.trim(),
-    email:document.getElementById("registerEmail").value.trim(),
-    phone:document.getElementById("registerPhone").value.trim()
-  };
-  saveState();
-  toast("Account created successfully");
-  const redirect = localStorage.getItem("parkinRedirectAfterLogin");
-  localStorage.removeItem("parkinRedirectAfterLogin");
-  navTo(redirect || "dashboard.html");
-}
+
+
+
 function demoSocial(provider){
   state.loggedIn = true;
   state.currentUser.name = provider === "Google" ? "Google User" : "GitHub User";
@@ -459,23 +573,8 @@ function money(n){ return Number(n).toFixed(2) + " EGP"; }
 function capitalize(s){ return String(s).charAt(0).toUpperCase() + String(s).slice(1); }
 function scrollToLot(){ document.getElementById("lot").scrollIntoView({behavior:"smooth",block:"center"}); toast("Navigation started"); }
 function toggleFaq(el){ el.classList.toggle("open"); }
-function topUpWallet(){
-  const amount = Number(prompt("Enter top up amount in EGP:", "100"));
-  if(!amount || amount <= 0) return;
-  state.walletBalance += amount;
-  saveState();
-  renderDashboard();
-  toast("Wallet topped up");
-}
-function transferWallet(){
-  const amount = Number(prompt("Enter transfer amount in EGP:", "50"));
-  if(!amount || amount <= 0) return;
-  if(amount > state.walletBalance){ toast("Not enough balance"); return; }
-  state.walletBalance -= amount;
-  saveState();
-  renderDashboard();
-  toast("Transfer completed");
-}
+
+
 function downloadReceipt(){
   const r = state.lastReceipt || state.history[0];
   const lines = ["PARKIN SESSION RECEIPT","----------------------",`ID: ${r.id}`,`Destination: ${r.destination}`,`Location: ${r.location}`,`Spot: ${r.spot}`,`Date: ${r.date}`,`Time In: ${r.timeIn}`,`Time Out: ${r.timeOut}`,`Duration: ${r.duration}`,`Total: ${r.amount}`,`Payment: ${r.payment}`,"Status: PAID"].join("\n");
@@ -516,28 +615,17 @@ function protectHomeClicks(){
   }, true);
 }
 
-function initApp(){
-  loadState();
-  updateNav();
-  protectHomeClicks();
-  if(!protectPage()) return;
-  const page = document.body.dataset.page;
-  if(page === "home") renderFeatured();
-  if(page === "destinations") renderDestinations();
-  if(page === "details") initDetails();
-  if(page === "checkout") initCheckout();
-  if(page === "confirmation") renderReceipt();
-  if(page === "dashboard") renderDashboard();
-  if(page === "history") renderFullHistory();
-}
-document.addEventListener("DOMContentLoaded", initApp);
+
+
 
 
 /* =========================
    BACKEND API INTEGRATION
    Keeps the same UI and connects it to Node/Express + MongoDB.
 ========================= */
-const API_BASE = window.location.origin.includes('localhost:5000') ? '/api' : 'http://localhost:5000/api';
+
+const API_BASE = 'http://localhost:5000/api';
+
 function getToken(){ return localStorage.getItem('parkinToken'); }
 function setToken(token){ localStorage.setItem('parkinToken', token); }
 function clearToken(){ localStorage.removeItem('parkinToken'); }
@@ -579,25 +667,304 @@ function protectPage(){
   return true;
 }
 async function loginUser(event){
-  event.preventDefault(); clearInvalid(); let ok=validateEmail('loginEmail'); const pass=document.getElementById('loginPassword'); if(pass.value.length<6){markInvalid(pass);ok=false;} if(!ok)return;
-  try{ const data=await apiRequest('/auth/login',{method:'POST',body:JSON.stringify({email:loginEmail.value.trim(),password:pass.value})}); applyBackendSession(data); toast('Logged in successfully'); const redirect=localStorage.getItem('parkinRedirectAfterLogin')||'dashboard.html'; localStorage.removeItem('parkinRedirectAfterLogin'); setTimeout(()=>navTo(redirect),450); }
-  catch(e){ toast(e.message); }
+
+  event.preventDefault();
+
+  clearInvalid();
+
+  let ok = true;
+
+  ok = validateEmail("loginEmail") && ok;
+
+  const pass = document.getElementById("loginPassword");
+
+  if(pass.value.trim().length < 6){
+    markInvalid(pass);
+    ok = false;
+  }
+
+  if(!ok) return;
+
+  try{
+
+    const email =
+      document.getElementById("loginEmail").value.trim();
+
+    const password =
+      document.getElementById("loginPassword").value;
+
+    const data = await apiRequest('/auth/login',{
+      method:'POST',
+      body:JSON.stringify({
+        email,
+        password
+      })
+    });
+
+    applyBackendSession(data);
+
+    // تأكيد تحديث الداتا الصح
+    if(data.user){
+
+      state.currentUser = {
+        name: data.user.name || "Guest User",
+        email: data.user.email || "",
+        phone: data.user.phone || ""
+      };
+
+      state.loggedIn = true;
+    }
+
+    saveState();
+
+    toast("Logged in successfully");
+
+    const redirect =
+      localStorage.getItem("parkinRedirectAfterLogin") ||
+      "dashboard.html";
+
+    localStorage.removeItem("parkinRedirectAfterLogin");
+
+    setTimeout(() => navTo(redirect), 400);
+
+  }catch(e){
+
+    toast(e.message || "Login failed");
+  }
 }
 async function registerUser(event){
-  event.preventDefault(); clearInvalid(); let ok=validateRequired('registerName')&&validateEmail('registerEmail')&&validateRequired('registerPhone'); const pass=document.getElementById('registerPassword'); if(pass.value.length<6){markInvalid(pass);ok=false;} if(!ok)return;
-  try{ const data=await apiRequest('/auth/register',{method:'POST',body:JSON.stringify({name:registerName.value.trim(),email:registerEmail.value.trim(),phone:registerPhone.value.trim(),password:pass.value})}); applyBackendSession(data); toast('Account created and saved to MongoDB'); const redirect=localStorage.getItem('parkinRedirectAfterLogin')||'dashboard.html'; localStorage.removeItem('parkinRedirectAfterLogin'); setTimeout(()=>navTo(redirect),450); }
-  catch(e){ toast(e.message); }
+
+  event.preventDefault();
+
+  clearInvalid();
+
+  let ok = true;
+
+  ok = validateRequired("registerName") && ok;
+  ok = validateEmail("registerEmail") && ok;
+  ok = validateRequired("registerPhone") && ok;
+
+  const pass = document.getElementById("registerPassword");
+
+  if(pass.value.trim().length < 6){
+    markInvalid(pass);
+    ok = false;
+  }
+
+  if(!ok) return;
+
+  try{
+
+    const payload = {
+      name: document.getElementById("registerName").value.trim(),
+      email: document.getElementById("registerEmail").value.trim(),
+      phone: document.getElementById("registerPhone").value.trim(),
+      password: pass.value
+    };
+
+    const data = await apiRequest('/auth/register',{
+      method:'POST',
+      body:JSON.stringify(payload)
+    });
+
+    applyBackendSession(data);
+
+    if(data.user){
+
+      state.currentUser = {
+        name: data.user.name || "",
+        email: data.user.email || "",
+        phone: data.user.phone || ""
+      };
+
+      state.loggedIn = true;
+    }
+
+    saveState();
+
+    toast("Account created successfully");
+
+    const redirect =
+      localStorage.getItem("parkinRedirectAfterLogin") ||
+      "dashboard.html";
+
+    localStorage.removeItem("parkinRedirectAfterLogin");
+
+    setTimeout(() => navTo(redirect), 400);
+
+  }catch(e){
+
+    toast(e.message || "Registration failed");
+  }
 }
-function logoutUser(){ clearToken(); state.loggedIn=false; saveState(); localStorage.removeItem('parkinRedirectAfterLogin'); toast('Logged out successfully'); setTimeout(()=>navTo('index.html'),350); }
+function logoutUser(){
+
+  clearToken();
+
+  state.loggedIn = false;
+
+  state.currentUser = {
+    name:"Guest User",
+    email:"",
+    phone:""
+  };
+
+  state.history = [];
+
+  state.lastReceipt = null;
+
+  saveState();
+
+  localStorage.removeItem('parkinRedirectAfterLogin');
+
+  toast('Logged out successfully');
+
+  setTimeout(() => navTo('index.html'), 350);
+}
 async function completePayment(event){
-  event.preventDefault(); clearInvalid();
-  if(state.selectedPayment==='Card'){ let ok=validateRequired('cardName')&&validateCardNumber()&&validateExpiry()&&validateCvv(); if(!ok)return; }
-  if(state.selectedPayment==='Wallet'&&!validateRequired('walletNumber')) return;
-  const total=calculateTotal(); if(state.selectedPayment==='Parkin Wallet'&&state.walletBalance<total){toast('Not enough wallet balance');return;}
-  const time=localStorage.getItem('parkinTime')||'14:30'; const hours=Number(localStorage.getItem('parkinHours')||2); const minutes=Number(localStorage.getItem('parkinMinutes')||15); const dateValue=localStorage.getItem('parkinDate')||new Date().toISOString().slice(0,10);
-  const payload={destinationId:state.currentDestination.id,destinationName:state.currentDestination.name,destinationLocation:state.currentDestination.location,spot:state.selectedSpot||'A-14',spotType:state.selectedSpotType,pricePerHour:state.selectedPrice,date:dateValue,timeIn:time,hours,minutes,amount:total,paymentMethod:state.selectedPayment,paymentDetails:{cardholderName:document.getElementById('cardName')?.value||'',cardLast4:document.getElementById('cardNumber')?.value?.replace(/\D/g,'').slice(-4)||'',walletNumber:document.getElementById('walletNumber')?.value||'',walletProvider:document.getElementById('walletProvider')?.value||''}};
-  try{ const data=await apiRequest('/payments/checkout',{method:'POST',body:JSON.stringify(payload)}); if(data.user)state.walletBalance=Number(data.user.walletBalance??state.walletBalance); const receipt=mapBookingFromApi(data.booking); state.lastReceipt=receipt; state.history.unshift(receipt); saveState(); toast('Payment saved to MongoDB'); setTimeout(()=>navTo('confirmation.html'),550); }
-  catch(e){ toast(e.message); }
+
+  event.preventDefault();
+
+  clearInvalid();
+
+  if(state.selectedPayment === 'Card'){
+
+    let ok =
+      validateRequired('cardName') &&
+      validateCardNumber() &&
+      validateExpiry() &&
+      validateCvv();
+
+    if(!ok) return;
+  }
+
+  if(
+    state.selectedPayment === 'Wallet' &&
+    !validateRequired('walletNumber')
+  ){
+    return;
+  }
+
+  const booking = getCurrentBookingData();
+
+  if(
+    state.selectedPayment === 'Parkin Wallet' &&
+    state.walletBalance < booking.total
+  ){
+    toast('Not enough wallet balance');
+    return;
+  }
+
+  const payload = {
+
+    
+    destinationId: booking.destination?.id || "",
+
+    destinationName: booking.destination.name,
+
+    destinationLocation: booking.destination.location,
+
+    spot: booking.spot,
+
+    spotType: booking.spotType,
+
+    pricePerHour: booking.price,
+
+    date: booking.date,
+
+    timeIn: booking.time,
+
+    hours: booking.hours,
+
+    minutes: booking.minutes,
+
+    durationText:
+      `${booking.hours}h ${String(booking.minutes).padStart(2,"0")}m`,
+
+    
+    amount: Number(booking.total),
+
+    paymentMethod: state.selectedPayment,
+
+    paymentDetails: {
+
+      cardholderName:
+        document.getElementById('cardName')?.value || '',
+
+      cardLast4:
+        document.getElementById('cardNumber')
+          ?.value
+          ?.replace(/\D/g,'')
+          .slice(-4) || '',
+
+      walletNumber:
+        document.getElementById('walletNumber')?.value || '',
+
+      walletProvider:
+        document.getElementById('walletProvider')?.value || ''
+    }
+  };
+
+  try{
+
+    const data = await apiRequest(
+      '/payments/checkout',
+      {
+        method:'POST',
+        body:JSON.stringify(payload)
+      }
+    );
+
+    if(data.user){
+      state.walletBalance =
+        Number(data.user.walletBalance || 0);
+    }
+
+    const receipt = {
+      id: data.booking?.receiptId || data.booking?._id,
+
+      destination: booking.destination.name,
+
+      location: booking.destination.location,
+
+      spot: booking.spot,
+
+      date: readableDate(booking.date),
+
+      timeIn: booking.time,
+
+      timeOut: addDuration(
+        booking.time,
+        booking.hours,
+        booking.minutes
+      ),
+
+      duration:
+        `${booking.hours}h ${String(booking.minutes).padStart(2,"0")}m`,
+
+      amount: money(booking.total),
+
+      payment: getReceiptPaymentLabel(),
+
+      status: "active"
+    };
+
+    state.lastReceipt = receipt;
+
+    state.history.unshift(receipt);
+
+    saveState();
+
+    toast("Payment successful");
+
+    setTimeout(() => {
+      navTo("confirmation.html");
+    }, 500);
+
+  }catch(e){
+
+    toast(e.message || "Payment failed");
+  }
 }
 async function renderDashboard(){ await loadBackendProfile(); await syncHistoryFromBackend(); setText('dashName',state.currentUser.name); setText('walletBalance',Number(state.walletBalance||0).toFixed(2)); setText('totalParkings',state.history.length); const el=document.getElementById('dashboardHistory'); if(el)el.innerHTML=state.history.slice(0,4).map((b,i)=>historyRow(b,i,false)).join('')||emptyHistory(); }
 async function renderFullHistory(){ await syncHistoryFromBackend(); const el=document.getElementById('fullHistory'); if(el)el.innerHTML=state.history.map((b,i)=>historyRow(b,i,true)).join('')||emptyHistory(); }
@@ -605,3 +972,4 @@ async function cancelBooking(index){ const booking=state.history[index]; if(!boo
 async function topUpWallet(){ const amount=Number(prompt('Enter top up amount in EGP:','100')); if(!amount||amount<=0)return; try{ const data=await apiRequest('/wallet/top-up',{method:'PATCH',body:JSON.stringify({amount})}); state.walletBalance=Number(data.walletBalance||0); saveState(); renderDashboard(); toast('Wallet topped up in MongoDB'); }catch(e){toast(e.message);} }
 async function transferWallet(){ const amount=Number(prompt('Enter transfer amount in EGP:','50')); if(!amount||amount<=0)return; try{ const data=await apiRequest('/wallet/transfer',{method:'PATCH',body:JSON.stringify({amount})}); state.walletBalance=Number(data.walletBalance||0); saveState(); renderDashboard(); toast('Transfer saved in MongoDB'); }catch(e){toast(e.message);} }
 async function initApp(){ loadState(); state.loggedIn=!!getToken()||state.loggedIn; await loadBackendProfile(); updateNav(); protectHomeClicks(); if(!protectPage())return; const page=document.body.dataset.page; renderFeatured(); if(page==='destinations')renderDestinations(); if(page==='details')initDetails(); if(page==='checkout')initCheckout(); if(page==='confirmation')renderReceipt(); if(page==='dashboard')renderDashboard(); if(page==='history')renderFullHistory(); }
+document.addEventListener("DOMContentLoaded", initApp);

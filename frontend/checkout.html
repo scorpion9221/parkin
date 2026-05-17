@@ -1018,20 +1018,32 @@
               </div>
             </div>
 
-            <form id="paymentForm" onsubmit="event.preventDefault(); toast('Payment completed successfully');">
+            <form id="paymentForm">
               <div class="form-grid">
                 <div class="field full">
-                  <label for="cardName">Cardholder name</label>
-                  <div class="input-shell">
-                    <input id="cardName" class="input" value="Omar Tarek" placeholder="Cardholder name" />
-                    <span class="field-icon">♙</span>
-                  </div>
+                <label for="cardName">Cardholder name</label>
+
+                <div class="input-shell">
+                  <input
+                    id="cardName"
+                    class="input"
+                    placeholder="John Doe"
+                  />
+
+                  <span class="field-icon">♙</span>
                 </div>
+              </div>
 
                 <div class="field full">
-                  <label for="cardNumber">Card number</label>
+  <label for="cardNumber">Card number</label>
+
                   <div class="input-shell">
-                    <input id="cardNumber" class="input" value="4242 4242 4242 4242" placeholder="0000 0000 0000 0000" />
+                    <input
+                      id="cardNumber"
+                      class="input"
+                      placeholder="4242 4242 4242 4242"
+                    />
+
                     <span class="field-icon">▭</span>
                   </div>
                 </div>
@@ -1065,37 +1077,37 @@
 
             <div class="summary-line">
               <span>Destination</span>
-              <strong id="receiptDestination">Capital Business Park</strong>
+              <strong id="receiptDestination"></strong>
             </div>
 
             <div class="summary-line">
               <span>Spot</span>
-              <strong id="receiptSpot">A-14</strong>
+              <strong id="receiptSpot"></strong>
             </div>
 
             <div class="summary-line">
               <span>Date</span>
-              <strong id="receiptDate">16 May 2026</strong>
+              <strong id="receiptDate"></strong>
             </div>
 
             <div class="summary-line">
               <span>Time In</span>
-              <strong id="receiptTimeIn">14:30</strong>
+              <strong id="receiptTimeIn"></strong>
             </div>
 
             <div class="summary-line">
               <span>Duration</span>
-              <strong id="receiptDuration">2h 15m</strong>
+              <strong id="receiptDuration"></strong>
             </div>
 
             <div class="summary-line">
               <span>Pricing</span>
-              <strong>22 EGP / hr</strong>
+              <strong id="receiptSubtotal"></strong>
             </div>
 
             <div class="summary-line">
               <span>Parking Fee</span>
-              <strong id="receiptSubtotal">49.50 EGP</strong>
+              <strong id="receiptParkingFee"></strong>
             </div>
 
             <div class="summary-line">
@@ -1107,13 +1119,15 @@
 
             <div class="total-row">
               <span>Total Amount</span>
-              <strong id="receiptTotal">49.50 EGP</strong>
+              <strong id="receiptTotal"></strong>
             </div>
 
             <div class="payment-logo">
-              <span id="receiptPayment">
+                            <span>
                 Payment Method<br>
-                <strong>•••• 4242 (Visa)</strong>
+                <strong id="receiptCard">
+                  •••• 4242 (Visa)
+                </strong>
               </span>
 
               <div class="check-circle">✓</div>
@@ -1181,5 +1195,138 @@
   </footer>
 
   <script src="js/app.js"></script>
+  <script>
+  // =========================
+  // Load booking data
+  // =========================
+
+  const destination =
+  JSON.parse(localStorage.getItem("parkinDestination"));
+
+const spot =
+  localStorage.getItem("parkinSpot");
+
+const date =
+  localStorage.getItem("parkinDate");
+
+const time =
+  localStorage.getItem("parkinTime");
+
+const hours =
+  localStorage.getItem("parkinHours");
+
+const minutes =
+  localStorage.getItem("parkinMinutes");
+
+const total =
+  localStorage.getItem("parkinTotal");
+
+// duration text
+const durationText =
+  `${hours}h ${minutes}m`;
+
+// Fill summary
+document.getElementById("receiptDestination").textContent =
+  destination?.name || "No destination";
+
+document.getElementById("receiptSpot").textContent =
+  spot || "No spot";
+
+document.getElementById("receiptDate").textContent =
+  date || "No date";
+
+document.getElementById("receiptTimeIn").textContent =
+  time || "No time";
+
+document.getElementById("receiptDuration").textContent =
+  durationText;
+
+document.getElementById("receiptSubtotal").textContent =
+  `${total || 0} EGP`;
+
+
+
+document.getElementById("receiptParkingFee").textContent =
+  `${total || 0} EGP`;
+
+document.getElementById("receiptTotal").textContent =
+  `${total || 0} EGP`;
+const cardInput =
+  document.getElementById("cardNumber");
+
+cardInput.addEventListener("input", () => {
+
+  const value =
+    cardInput.value.replace(/\s/g, "");
+
+  const last4 =
+    value.slice(-4);
+
+  document.getElementById("receiptCard").textContent =
+    last4
+      ? `•••• ${last4} (Visa)`
+      : "•••• 4242 (Visa)";
+});
+  paymentForm.addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  // =========================
+  // 1. DATA FOR BACKEND
+  // =========================
+  const payload = {
+    destinationName: destination?.name,
+    destinationLocation: destination?.location,
+    spot,
+    date,
+    timeIn: time,
+    hours,
+    minutes,
+    amount: total,
+    paymentMethod: "Card",
+    paymentDetails: {
+      cardLast4: document.getElementById("cardNumber").value.slice(-4)
+    }
+  };
+
+  try {
+    const response = await fetch("http://localhost:5000/api/payments/checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${getToken()}`
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    console.log("DB RESPONSE:", data);
+
+    // =========================
+    // 2. KEEP SUMMARY WORKING
+    // =========================
+    localStorage.setItem("parkinDestination", JSON.stringify(destination));
+    localStorage.setItem("parkinSpot", spot);
+    localStorage.setItem("parkinDate", date);
+    localStorage.setItem("parkinTime", time);
+    localStorage.setItem("parkinHours", hours);
+    localStorage.setItem("parkinMinutes", minutes);
+    localStorage.setItem("parkinTotal", total);
+
+    // optional: save backend result too
+    localStorage.setItem("latestBooking", JSON.stringify(data.booking));
+    localStorage.setItem("latestPayment", JSON.stringify(data.payment));
+
+    toast("Payment completed successfully");
+
+    setTimeout(() => {
+      window.location.href = "dashboard.html";
+    }, 1200);
+
+  } catch (error) {
+    console.error(error);
+    toast("Server error");
+  }
+});
+</script>
 </body>
 </html>
