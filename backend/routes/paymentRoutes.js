@@ -21,18 +21,15 @@ function paymentLabel(method, details = {}){
   return 'Parkin Wallet';
 }
 
+
 router.post('/checkout', protect, async (req, res) => {
-  try{
+    
+    console.log("USER:", req.user);
+    console.log("BODY:", req.body);
+  try {
+
     const body = req.body;
     const amount = Number(body.amount || 0);
-    if(!body.destinationName || !body.spot || amount <= 0) return res.status(400).json({ message: 'Destination, spot and amount are required.' });
-
-    const user = await User.findById(req.user._id);
-    if(body.paymentMethod === 'Parkin Wallet'){
-      if(user.walletBalance < amount) return res.status(400).json({ message: 'Not enough wallet balance.' });
-      user.walletBalance -= amount;
-      await user.save();
-    }
 
     const start = new Date(`${body.date}T${body.timeIn || '14:30'}:00`);
     const totalMinutes = Number(body.hours || 0) * 60 + Number(body.minutes || 0);
@@ -70,9 +67,15 @@ router.post('/checkout', protect, async (req, res) => {
       walletNumber: details.walletNumber
     });
 
-    res.status(201).json({ booking, payment, user: { walletBalance: user.walletBalance } });
-  }catch(err){
-    res.status(500).json({ message: err.message });
+    return res.status(201).json({
+      booking,
+      payment,
+      user: { walletBalance: req.user.walletBalance }
+    });
+
+  } catch (err) {
+    console.error("❌ PAYMENT ERROR:", err);
+    return res.status(500).json({ message: err.message });
   }
 });
 
